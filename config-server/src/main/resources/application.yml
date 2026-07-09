@@ -1,0 +1,15 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        native:
+          # Tells Spring to read raw files from a local directory instead of a Git repository
+          search-locations: file:/Users/firatkaraca/Desktop/Java Projects/Config Server
+  profiles:
+    # Activates the "native" file system storage backend profiles approach
+    active: native

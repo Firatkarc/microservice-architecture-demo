@@ -1,0 +1,78 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  # 🔌 1. Added local Reactive Redis database link
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: auth
+              uri: lb://customer-service
+              predicates:
+                - Path=/auth/**
+
+            - id: customer-service
+              uri: lb://customer-service
+              predicates:
+                - Path=/customer/**
+              # 🎯 2. Added Throttling Filter to Customer Service
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    key-resolver: "#{@userKeyResolver}"
+
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/order/**
+              # 🎯 3. Added Throttling Filter to Order Service
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    key-resolver: "#{@userKeyResolver}"
+
+            - id: customer-service-docs
+              uri: lb://customer-service
+              predicates:
+                - Path=/customer-service/v3/api-docs
+              filters:
+                - RewritePath=/customer-service/v3/api-docs, /v3/api-docs
+
+            - id: order-service-docs
+              uri: lb://order-service
+              predicates:
+                - Path=/order-service/v3/api-docs
+              filters:
+                - RewritePath=/order-service/v3/api-docs, /v3/api-docs
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: Customer Service
+        url: /customer-service/v3/api-docs
+      - name: Order Service
+        url: /order-service/v3/api-docs
+openapi:
+  servers:
+    - url: http://localhost:8080
+      description: API Gateway Server
+
+jwt:
+  secret: ThisIsASuperSecretKeyForJWTSigningChangeMe123!

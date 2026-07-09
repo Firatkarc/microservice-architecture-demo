@@ -1,0 +1,16 @@
+# Maven build outputs (compiled code)
+**/target/
+*.jar
+*.war
+
+# IntelliJ IDEA internal settings files
+.idea/
+*.iml
+*.iws
+.classpath
+.project
+.settings/
+
+# macOS operating system junk files
+.DS_Store
+Thumbs.db
