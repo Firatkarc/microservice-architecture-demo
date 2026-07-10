@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/order")
@@ -24,8 +25,8 @@ public class OrderController {
         return restTemplate.getForObject(url,String.class);
     }
 
-    @GetMapping("/ordered")
-    public String sendOrder()
+    @GetMapping("/status")
+    public String sendOrder(HttpServletRequest request)
     {   if("8082".equals(serverport)){
         try{
             Thread.sleep(3000);
@@ -33,5 +34,5 @@ public class OrderController {
             throw new RuntimeException(e);
         }
     }
-        return "Ordered from port : " + serverport;}
+        return "Order processed successfully by Order Service (Port: " + serverport + ").";}
 }

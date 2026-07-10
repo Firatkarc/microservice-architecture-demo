@@ -24,20 +24,22 @@ public class CustomerController {
     private String denemeConfig;
 
     @GetMapping("/refresh-deneme")
-    public String sayDeneme() {
-        return "value : " + denemeConfig;
+    public String getConfigurationValue() {
+        return "Current configuration value:  " + denemeConfig;
     }
 
 
-    @GetMapping("/hello")
-    public String sayHello(){return "Customer service response";}
+    @GetMapping("/status")
+    public String getCustomerServiceStatus(){return "Customer Service is running successfully.";}
+
+
 
     @GetMapping("/whoami")
-    public String whoAmI(@RequestHeader(value = "X-User-Id", required = false) String userId) {
-        return "You are: " + userId;
+    public String getAuthenticatedUser(@RequestHeader(value = "X-User-Id", required = false) String userId) {
+        return "Authenticated user: " + userId;
     }
 
-    @GetMapping("/callOrder")
+    @GetMapping("/order-status")
     @Retry(name = "orderServiceRetry", fallbackMethod = "handleOrderServiceFailure")
     @CircuitBreaker(name = "orderServiceCB", fallbackMethod = "handleOrderServiceFailure")
     public String callOrderService() {
@@ -47,6 +49,6 @@ public class CustomerController {
 
     }
     public String handleOrderServiceFailure(Throwable throwable) {
-        return "Order services are down at the moment";
+        return "Order services are down at the moment.Please try again later.";
     }
 }

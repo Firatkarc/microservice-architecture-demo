@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.boot.restclient.RestTemplateBuilder;
 
 @SpringBootApplication
 public class CustomerServiceApplication {
@@ -16,7 +16,7 @@ public class CustomerServiceApplication {
 
 	@Bean
 	@LoadBalanced
-	public RestTemplate restTemplate(){
-		return new RestTemplate();
+	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+		return builder.build();
 	}
 }
