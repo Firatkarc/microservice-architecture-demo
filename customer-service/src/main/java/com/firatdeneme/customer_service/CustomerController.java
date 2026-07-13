@@ -6,10 +6,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
@@ -20,17 +17,17 @@ public class CustomerController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${deneme}")
-    private String denemeConfig;
-
-    @GetMapping("/refresh-deneme")
-    public String getConfigurationValue() {
-        return "Current configuration value:  " + denemeConfig;
-    }
-
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @GetMapping("/status")
     public String getCustomerServiceStatus(){return "Customer Service is running successfully.";}
+
+    @PostMapping("/insert")
+    public String insertCustomer(@RequestBody Customer customer) {
+        Customer savedCustomer = customerRepository.save(customer);
+        return "Customer successfully saved to H2 DB with ID: " + savedCustomer.getId();
+    }
 
 
 
@@ -44,11 +41,13 @@ public class CustomerController {
     @CircuitBreaker(name = "orderServiceCB", fallbackMethod = "handleOrderServiceFailure")
     public String callOrderService() {
 
-            String url = "http://order-service/order/ordered";
+            String url = "http://order-service/order/status";
             return restTemplate.getForObject(url, String.class);
 
     }
     public String handleOrderServiceFailure(Throwable throwable) {
         return "Order services are down at the moment.Please try again later.";
     }
+
+
 }

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auth Login</title>
+    <style>
+        body { font-family: sans-serif; margin: 50px; background: #f4f4f4; }
+        .container { max-width: 400px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; width: 100%; }
+        button:hover { background: #0056b3; }
+        #result { margin-top: 20px; padding: 10px; background: #e9ecef; border-radius: 4px; word-break: break-all; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Login to Get Token</h2>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+        </div>
+        <button type="submit">Get Token</button>
+    </form>
+
+    <div id="result" style="display: none;"></div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const usernameVal = document.getElementById('username').value;
+        const passwordVal = document.getElementById('password').value;
+        const resultDiv = document.getElementById('result');
+
+        try {
+            // Sends the data as JSON matching your LoginRequest record
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: usernameVal,
+                    password: passwordVal
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                resultDiv.style.display = 'block';
+                resultDiv.style.color = 'green';
+                resultDiv.innerHTML = `<strong>Success! Token:</strong><br>${data.token}`;
+            } else {
+                resultDiv.style.display = 'block';
+                resultDiv.style.color = 'red';
+                resultDiv.innerHTML = `<strong>Error:</strong> ${data.message || 'Unauthorized'}`;
+            }
+        } catch (error) {
+            resultDiv.style.display = 'block';
+            resultDiv.style.color = 'red';
+            resultDiv.innerHTML = `<strong>Error:</strong> Could not connect to server.`;
+        }
+    });
+</script>
+
+</body>
+</html>
