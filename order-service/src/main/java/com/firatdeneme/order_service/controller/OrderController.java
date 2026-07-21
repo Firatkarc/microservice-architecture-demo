@@ -1,4 +1,4 @@
-package com.firatdeneme.order_service;
+package com.firatdeneme.order_service.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -54,26 +53,21 @@ public class OrderController {
         return "Order processed successfully by Order Service (Port: " + serverport + ").";
     }
 
-    // --- NEW WEB ENDPOINTS ---
 
-    // Serves the HTML Page at /order/postOrder
-    @GetMapping("/postOrder")
+    @GetMapping("/send-order")
     public ModelAndView showOrderForm() {
         return new ModelAndView("postOrder");
     }
 
-    // Handles retrieving and displaying all customers who have orders
     @GetMapping("/show-orders")
     public List<Map<String, Object>> getAllOrders() {
         List<Map<String, Object>> ordersList = new ArrayList<>();
         try {
-            // Fetch only customers that have an assigned order
             Query query = entityManager.createNativeQuery(
                     "SELECT ID, NAME, EMAIL, ORDER_ID, ITEM_NAME FROM CUSTOMERS WHERE ORDER_ID IS NOT NULL"
             );
             List<?> results = query.getResultList();
 
-            // Map raw database rows into structured JSON fields
             for (Object result : results) {
                 Object[] row = (Object[]) result;
                 Map<String, Object> orderMap = new HashMap<>();
@@ -92,8 +86,7 @@ public class OrderController {
         return ordersList;
     }
 
-    // Handles form submission and updates the customer table row
-    @PostMapping("/postOrder")
+    @PostMapping("/send-order")
     public ModelAndView processOrder(@RequestParam("name") String name,
                                      @RequestParam("email") String email,
                                      @RequestParam("itemName") String itemName) {
@@ -101,13 +94,11 @@ public class OrderController {
         try {
             long generatedOrderId = (long) (Math.random() * 100000);
 
-            // Construct a simple JSON payload to send over Kafka
             String orderPayload = String.format(
                     "{\"name\":\"%s\", \"email\":\"%s\", \"orderId\":%d, \"itemName\":\"%s\"}",
                     name, email, generatedOrderId, itemName
             );
 
-            // Publish message to the "order-topic"
             kafkaTemplate.send("order-topic", orderPayload);
 
             modelAndView.addObject("success", "Order request sent to Kafka! Assigned Order ID: " + generatedOrderId);

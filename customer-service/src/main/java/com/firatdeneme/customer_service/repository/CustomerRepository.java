@@ -1,5 +1,6 @@
-package com.firatdeneme.customer_service;
+package com.firatdeneme.customer_service.repository;
 
+import com.firatdeneme.customer_service.model.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

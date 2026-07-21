@@ -1,4 +1,4 @@
-package com.firatdeneme.customer_service;
+package com.firatdeneme.customer_service.controller;
 
 import com.firatdeneme.customer_service.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;

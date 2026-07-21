@@ -1,4 +1,4 @@
-package com.firatdeneme.customer_service;
+package com.firatdeneme.customer_service.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +22,12 @@ public class OrderConsumerService {
     @Transactional
     public void consumeOrder(String message) {
         try {
-            // Parse the incoming JSON message string into a map
             Map<String, Object> orderData = objectMapper.readValue(message, Map.class);
             String name = (String) orderData.get("name");
             String email = (String) orderData.get("email");
             Integer orderId = (Integer) orderData.get("orderId");
             String itemName = (String) orderData.get("itemName");
 
-            // Execute database check and update/insert logic locally inside customer-service
             Query findNullOrderQuery = entityManager.createNativeQuery(
                     "SELECT ID FROM CUSTOMERS WHERE NAME = ?1 AND EMAIL = ?2 AND ORDER_ID IS NULL"
             );

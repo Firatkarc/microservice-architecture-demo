@@ -1,10 +1,11 @@
-package com.firatdeneme.customer_service;
+package com.firatdeneme.customer_service.controller;
 
 
+import com.firatdeneme.customer_service.model.Customer;
+import com.firatdeneme.customer_service.repository.CustomerRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
